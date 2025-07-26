@@ -2,68 +2,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Fan's Blog</title>
-    {{template "front/head.html"}}
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>My Blog</title>
+  <meta name="description" content="A modern, beautiful blog powered by GoLyanna" />
+  <meta name="keywords" content="blog, tech, life, golang, gin" />
+  <meta name="author" content="GoLyanna" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
+  <link href="/static/css/boxicons.min.css" rel="stylesheet">
+  <link href="/static/css/bootstrap-icons.css" rel="stylesheet">
+  <link href="/static/css/aos.css" rel="stylesheet">
+  <link href="/static/css/glightbox.min.css" rel="stylesheet">
+  <link href="/static/css/swiper-bundle.min.css" rel="stylesheet">
+  <link rel="icon" href="/static/img/favicon.png">
 </head>
 <body>
-
-    {{template "front/menu.html"}}
-    <div class="container" id="content-outer">
-        <div class="inner" id="content-inner">
-            <div class="recent-posts">
-                {{ range .posts }}
-                <article class="recent-post-item">
-                    <a class="title" href="/post/{{.ID}}"><h2>{{.Title}}</h2></a>
-                    <div class="post-meta">
-                        <time class="time" datetime="{{dateFormat .CreatedAt "2006-01-02 15:04:05" }}">
-                            {{dateFormat .CreatedAt "2006-01-02 15:04" }}
-                        </time>
-                        <span class="slash">/</span>
-                        {{$PTGS := .Tags }}
-                        <ul class="index-tag-list">
-                            {{ range $k,$v := $PTGS}}
-                            <li class="index-tag-list-item"><a class="index-tag-list-link" href="/tag/{{$v.ID}}">{{$v.Name}}</a></li>
-                            {{end}}
-                        </ul>
-                    </div>
-                    <div class="post-excerpt">
-                        <p>{{.Excerpt}}</p>
-                    </div>
-
-                    <a class="more" href="/post/{{.ID}}"> 阅读全文 〉</a>
-                </article>
-                {{end}}
-            </div>
-        </div>
-        <nav class="page-nav text-center">
-            {{ if .pagination.HasPrev }}
-            <a class="extend prev" rel="prev" href="/pages/{{.pagination.PrevNum}}">〈</a>
-            {{end}}
-            {{$Pagination := .pagination}}
-            {{$PageRet := $Pagination.PageRet }}
-            {{$CurrentPage := $Pagination.CurrentPage }}
-            {{ range $k,$v := $PageRet}}
-                {{ if ne $v -1 }}
-                    {{ if eq $v  $CurrentPage }}
-                        <span class="page-number current">{{$v}}</span>
-                    {{else}}
-                        <a class="page-number" href="/pages/{{$v}}">{{$v}}</a>
-                    {{end}}
-                {{else}}
-                    <span class=ellipsis>…</span>
-                {{end}}
-            {{end}}
-            {{ if $Pagination.HasNext }}
-                {{$NextNum := $Pagination.NextNum }}
-                <a class="extend next" rel="next" href="/pages/{{$NextNum}}">〉</a>
-            {{end}}
-        </nav>
-
-
+  <!-- ======= Header ======= -->
+  <header id="header" class="d-flex align-items-center">
+    <div class="container d-flex align-items-center justify-content-between">
+      <a href="/" class="logo"><img src="/static/img/logo.png" alt="logo" class="img-fluid" style="max-height:48px;"></a>
+      <nav id="navbar" class="navbar navbar-home">
+        <ul>
+          <li><a class="nav-link scrollto active" href="/">Home</a></li>
+          <li><a class="nav-link scrollto" href="/archives">Archives</a></li>
+          <li><a class="nav-link scrollto" href="/tags">Tags</a></li>
+          <li><a class="nav-link scrollto" href="/about">About</a></li>
+          <li><a class="nav-link scrollto" href="/contact">Contact</a></li>
+        </ul>
+      </nav>
+      <i class="bi bi-list mobile-nav-toggle"></i>
     </div>
-    {{template "front/footer.html"}}
+  </header>
+  <!-- End Header -->
 
+  <!-- ======= Hero Section ======= -->
+  <section id="hero" class="d-flex align-items-center">
+    <div class="container position-relative" data-aos="fade-up" data-aos-delay="500">
+      <p>Welcome to</p>
+      <h1>My Blog</h1>
+      <h2>Thoughts | Ideas | Stories</h2>
+    </div>
+    <div class="social-links">
+      <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+      <a href="#" class="github"><i class="bi bi-github"></i></a>
+      <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+    </div>
+  </section>
+  <!-- End Hero -->
+
+  <main id="main">
+    <!-- ======= Blog Posts Section ======= -->
+    <section id="blog-posts" class="blog-posts">
+      <div class="container">
+        <div class="row page_ttl">
+          <div class="col-sm-6">
+            <h3>Latest Posts</h3>
+          </div>
+          <div class="col-sm-6">
+            <p>Explore my latest thoughts and ideas on technology, life, and everything in between.</p>
+          </div>
+        </div>
+        <div class="row">
+          {{range .posts}}
+          <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card h-100 shadow-sm blog_post_content" data-aos="fade-up">
+              <div class="card-body post-holder">
+                <h5 class="card-title post-title"><a href="/post/{{.ID}}">{{.Title}}</a></h5>
+                <div class="post-meta mb-2">
+                  <span class="date text-muted me-2"><i class="bi bi-calendar"></i> {{dateFormat .CreatedAt "Jan 02, 2006"}}</span>
+                  <span class="tags">
+                    {{range .Tags}}
+                    <a href="/tag/{{.ID}}" class="badge bg-secondary text-light">{{.Name}}</a>
+                    {{end}}
+                  </span>
+                </div>
+                <p class="card-text post-excerpt">{{.Summary}}</p>
+                <a class="btn btn-outline-primary btn-sm read-more" href="/post/{{.ID}}">Read More</a>
+              </div>
+            </div>
+          </div>
+          {{end}}
+        </div>
+        <!-- 分页控件 -->
+        <nav class="mt-4">
+          <ul class="pagination justify-content-center">
+            {{if .pagination.HasPrev}}
+            <li class="page-item"><a class="page-link" href="/pages/{{.pagination.PrevNum}}">&laquo; Prev</a></li>
+            {{end}}
+            {{range $k, $v := .pagination.PageRet}}
+              {{if ne $v -1}}
+                {{if eq $v $.pagination.CurrentPage}}
+                  <li class="page-item active"><span class="page-link">{{$v}}</span></li>
+                {{else}}
+                  <li class="page-item"><a class="page-link" href="/pages/{{$v}}">{{$v}}</a></li>
+                {{end}}
+              {{else}}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+              {{end}}
+            {{end}}
+            {{if .pagination.HasNext}}
+            <li class="page-item"><a class="page-link" href="/pages/{{.pagination.NextNum}}">Next &raquo;</a></li>
+            {{end}}
+          </ul>
+        </nav>
+      </div>
+    </section>
+    <!-- End Blog Posts Section -->
+  </main>
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="footer-top">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="footer-info">
+              <h3>My Blog</h3>
+              <p>Sharing thoughts and ideas about technology and life.</p>
+              <div class="social-links mt-3">
+                <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                <a href="#" class="github"><i class="bi bi-github"></i></a>
+                <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="footer-links">
+              <h4>Quick Links</h4>
+              <ul>
+                <li><a href="/archives">Archives</a></li>
+                <li><a href="/tags">Tags</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container py-3">
+      <div class="copyright text-center">
+        &copy; <script>document.write(new Date().getFullYear());</script> My Blog. All Rights Reserved
+      </div>
+    </div>
+  </footer>
+  <!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="/static/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/aos.js"></script>
+  <script src="/static/js/glightbox.min.js"></script>
+  <script src="/static/js/swiper-bundle.min.js"></script>
+  <script src="/static/js/main.js"></script>
 </body>
 </html>
 {{end}}
