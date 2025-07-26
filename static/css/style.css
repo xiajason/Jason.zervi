@@ -738,7 +738,9 @@ section {
 # Our Services
 --------------------------------------------------------------*/
 
-.our-services {}
+.our-services {
+  /* Services section styles */
+}
 
 .our-services .page_ttl {
   margin-bottom: 30px;
@@ -2396,7 +2398,9 @@ section {
   background-repeat: no-repeat;
 }
 
-.about_detail {}
+.about_detail {
+  /* About detail section styles */
+}
 
 .about_detail h5 {
   font-size: 18px;
@@ -2469,7 +2473,9 @@ section {
   color: #293A5C;
 }
 
-.service_detail {}
+.service_detail {
+  /* Service detail section styles */
+}
 
 .service_detail img {
   margin-bottom: 15px;
@@ -2504,7 +2510,9 @@ section {
   ;
 }
 
-.inner_btn {}
+.inner_btn {
+  /* Inner button styles */
+}
 
 .inner_btn a {
   background: #004767;
@@ -2584,7 +2592,9 @@ section {
   line-height: 24px;
 }
 
-.careers_detail {}
+.careers_detail {
+  /* Careers detail section styles */
+}
 
 .careers_box {
   display: inline-block;
@@ -2944,7 +2954,6 @@ section {
 
   .inner_pages #header .logo {
     margin: 10px 0 20px 0;
-    display: inline-block;
     float: left;
   }
 

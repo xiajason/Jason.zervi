@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"lyanna/models"
 	"lyanna/utils"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/feeds"
@@ -17,7 +18,7 @@ func GetRss(c *gin.Context) {
 		Title:       "My Blog",
 		Link:        &feeds.Link{Href: "http://127.0.0.1:9080"},
 		Description: "A modern, beautiful blog powered by GoLyanna",
-		Author:      &feeds.Author{Name: "GoLyanna", Email: "admin@example.com"},
+		Author:      &feeds.Author{Name: "szbolent", Email: "szbolent@example.com"},
 		Created:     now,
 	}
 	feed.Items = make([]*feeds.Item, 0)
@@ -41,6 +42,9 @@ func GetRss(c *gin.Context) {
 		msg := fmt.Sprintf("feed to rss err:%v", err)
 		Logger.Fatal(msg)
 	}
+	// 使用正则表达式替换managingEditor信息
+	re := regexp.MustCompile(`<managingEditor>admin@example\.com \(GoLyanna\)</managingEditor>`)
+	rss = re.ReplaceAllString(rss, "<managingEditor>szbolent@example.com (szbolent)</managingEditor>")
 	c.Writer.WriteString(rss)
 
 }
