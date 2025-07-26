@@ -2,59 +2,60 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-gonic/gin"
 	"log"
 	"lyanna/models"
 	"lyanna/utils"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 )
 
 func UserLogin(c *gin.Context) {
 	var (
-		err error
+		err  error
 		user *models.User
 	)
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	if username == "" || password == "" {
-		c.HTML(http.StatusOK,"admin/login.html", gin.H{
-			"msg":"username or password not null",
+		c.HTML(http.StatusOK, "admin/login.html", gin.H{
+			"msg": "username or password not null",
 		})
 		return
 	}
 	user, err = models.GetUserByName(username)
-	if err != nil || user.PassWord != utils.Md5(username + password) {
+	if err != nil || user.PassWord != utils.Md5(username+password) {
 		c.HTML(http.StatusOK, "admin/login.html", gin.H{
 			"msg": "invalid username or passwrod",
 		})
 		return
 	}
 	if !user.Active {
-		c.HTML(http.StatusOK,"admin/login.html",gin.H{
-			"msg":"user is not active",
+		c.HTML(http.StatusOK, "admin/login.html", gin.H{
+			"msg": "user is not active",
 		})
 		return
 	}
 	s := sessions.Default(c)
 	s.Clear()
-	s.Set(models.SESSION_KEY,user.ID)
+	s.Set(models.SESSION_KEY, user.ID)
 	s.Save()
-	c.Redirect(http.StatusMovedPermanently,"/admin")
+	c.Redirect(http.StatusMovedPermanently, "/admin")
 }
 
 func UserList(c *gin.Context) {
 	users, err := models.ListUsers()
 	if err != nil {
-		msg := fmt.Sprintf("list users err:%v",err)
+		msg := fmt.Sprintf("list users err:%v", err)
 		Logger.Fatal(msg)
 	}
 	user, _ := c.Get(models.CONTEXT_USER_KEY)
 	pagination := utils.Pagination{
-		CurrentPage:1,
-		PerPage:models.Conf.General.PerPage,
-		Total:len(users),
+		CurrentPage: 1,
+		PerPage:     models.Conf.General.PerPage,
+		Total:       len(users),
 	}
 	var perUsers []*models.User
 	if models.Conf.General.PerPage > len(users) {
@@ -62,125 +63,124 @@ func UserList(c *gin.Context) {
 	} else {
 		perUsers = users[:models.Conf.General.PerPage]
 	}
-	c.HTML(http.StatusOK, "admin/list_user.html",gin.H{
-		"users": perUsers,
-		"user": user,
-		"user_count":len(users),
-		"pagination":&pagination,
+	c.HTML(http.StatusOK, "admin/list_user.html", gin.H{
+		"users":      perUsers,
+		"user":       user,
+		"user_count": len(users),
+		"pagination": &pagination,
 	})
 }
 
 func AdminUserPage(c *gin.Context) {
 	page := c.Param("page")
-	pageInt, err := strconv.ParseInt(page,10,32)
+	pageInt, err := strconv.ParseInt(page, 10, 32)
 	if err != nil {
-		msg := fmt.Sprintf("parse int err:%v",err)
+		msg := fmt.Sprintf("parse int err:%v", err)
 		Logger.Fatal(msg)
 	}
 	users, err := models.ListUsers()
 	if err != nil {
-		msg := fmt.Sprintf("list users err:%v",err)
+		msg := fmt.Sprintf("list users err:%v", err)
 		Logger.Fatal(msg)
 	}
 	user, _ := c.Get(models.CONTEXT_USER_KEY)
 	pagination := utils.Pagination{
-		CurrentPage:int(pageInt),
-		PerPage:models.Conf.General.PerPage,
-		Total:len(users),
+		CurrentPage: int(pageInt),
+		PerPage:     models.Conf.General.PerPage,
+		Total:       len(users),
 	}
-	start := (int(pageInt) -1) * models.Conf.General.PerPage
+	start := (int(pageInt) - 1) * models.Conf.General.PerPage
 	var end int
 	if start+models.Conf.General.PerPage > len(users) {
 		end = len(users)
 	} else {
-		end = start+models.Conf.General.PerPage
+		end = start + models.Conf.General.PerPage
 	}
 	perUsers := users[start:end]
-	c.HTML(http.StatusOK, "admin/list_user.html",gin.H{
-		"users": perUsers,
-		"user": user,
-		"user_count":len(users),
-		"pagination":&pagination,
+	c.HTML(http.StatusOK, "admin/list_user.html", gin.H{
+		"users":      perUsers,
+		"user":       user,
+		"user_count": len(users),
+		"pagination": &pagination,
 	})
 }
 
 func PostUserEdit(c *gin.Context) {
 
 	id := c.Param("id")
-	uID, err := strconv.ParseUint(id,10,64)
+	uID, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		return
 	}
 	name := c.PostForm("username")
 	email := c.PostForm("email")
 	password := c.PostForm("password")
-	active :="on" == c.PostForm("active")
+	active := c.PostForm("active") == "on"
 
 	user := &models.User{
-		Name:name,
-		Email:email,
-		PassWord:password,
-		Active:active,
+		Name:     name,
+		Email:    email,
+		PassWord: password,
+		Active:   active,
 	}
 	user.ID = uID
 	err = user.Update()
 	if err != nil {
-		c.HTML(http.StatusOK, "admin/list_user.html",gin.H{
-			"user":user,
-			"msg": err.Error(),
+		c.HTML(http.StatusOK, "admin/list_user.html", gin.H{
+			"user": user,
+			"msg":  err.Error(),
 		})
 	}
 	users, _ := models.ListUsers()
-	c.HTML(http.StatusOK,"admin/list_user.html",gin.H{
-		"users":users,
-		"user":user,
-		"user_count":len(users),
-		"msg":"User was successfully updated.",
+	c.HTML(http.StatusOK, "admin/list_user.html", gin.H{
+		"users":      users,
+		"user":       user,
+		"user_count": len(users),
+		"msg":        "User was successfully updated.",
 	})
 }
 
 func GetEditUser(c *gin.Context) {
 	id := c.Param("id")
-	uID, err := strconv.ParseUint(id,10,64)
+	uID, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		return
 	}
 	user, _ := models.GetUserByID(uID)
 	log.Println(user)
 	if user == nil {
-		c.Redirect(http.StatusMovedPermanently,"/admin/users")
+		c.Redirect(http.StatusMovedPermanently, "/admin/users")
 	}
-	c.HTML(http.StatusOK, "admin/user.html",gin.H{
-		"user":user,
+	c.HTML(http.StatusOK, "admin/user.html", gin.H{
+		"user": user,
 	})
 }
 
 func GetCreateUser(c *gin.Context) {
-	c.HTML(http.StatusOK, "admin/user.html",nil)
+	c.HTML(http.StatusOK, "admin/user.html", nil)
 }
 
 func PostCreateUser(c *gin.Context) {
 	name := c.PostForm("username")
 	email := c.PostForm("email")
 	password := c.PostForm("password")
-	active :="on" == c.PostForm("active")
+	active := c.PostForm("active") == "on"
 	md5Password := utils.Md5(name + password)
 	user := &models.User{
-		Name:name,
-		Email:email,
-		PassWord:md5Password,
-		Active:active,
+		Name:     name,
+		Email:    email,
+		PassWord: md5Password,
+		Active:   active,
 	}
 	err := user.Insert()
 	if err != nil {
 		return
 	}
 	users, _ := models.ListUsers()
-	c.HTML(http.StatusOK,"admin/list_user.html",gin.H{
-		"users":users,
-		"user":user,
-		"user_count":len(users),
-		"msg":"User was successfully created.",
+	c.HTML(http.StatusOK, "admin/list_user.html", gin.H{
+		"users":      users,
+		"user":       user,
+		"user_count": len(users),
+		"msg":        "User was successfully created.",
 	})
 }
-
