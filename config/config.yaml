@@ -1,20 +1,30 @@
 runmode: debug
 general:
     addr: :9080
-    dsn: root:ServBay.dev@(127.0.0.1:3306)/lyanna?charset=utf8&parseTime=True&loc=Local
-    sessionsecret: lyanna_blog
+    dsn: "root:password@(127.0.0.1:3306)/lyanna?charset=utf8mb4&parseTime=True&loc=Local"
+    sessionsecret: "lyanna_blog_secret_key_change_this_in_production"
     logoutenabled: true
     perpage: 10
 
 github:
-    clientid: 6b61462cd8f0807f09a0
-    clientsecret: 93bfae7774a3bbd511a0f7eff996b9963cbfd61e
-    authurl: https://github.com/login/oauth/authorize?client_id=%s&scope=user:email&state=%s
+    clientid: "your_github_client_id"
+    clientsecret: "your_github_client_secret"
+    authurl: "https://github.com/login/oauth/authorize?client_id=%s&scope=user:email&state=%s"
     # 与github配置的回调地址一致
-    redirecturl: http://127.0.0.1:9080/oauth2
-    tokenurl: https://github.com/login/oauth/access_token
+    redirecturl: "http://127.0.0.1:9080/oauth2"
+    tokenurl: "https://github.com/login/oauth/access_token"
+
+redis:
+    host: "127.0.0.1"
+    port: 6379
+    password: ""
+    db: 0
+    maxidle: 64
+    maxactive: 100
+    idletimeout: 240
+
 log:
-    logpath: ./logs/lyanna.log
+    logpath: "./logs/lyanna.log"
     maxsize: 20
     maxage: 7
     compress: true
